@@ -1,2 +1,2 @@
-# js-reflection-challenge-2
- 
+# JavaScript Reflection (Challenge 2)
+My assignment for the Netmatters SCS course.
