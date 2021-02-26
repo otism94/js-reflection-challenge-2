@@ -5,20 +5,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /**
  * Variables
  */
+// Picsum API
 var picsumURL = function picsumURL(page) {
   return "https://picsum.photos/v2/list?page=".concat(page, "&limit=100");
-};
+}; // Button DOM queries
+
 
 var btnLink = $('.btn-link');
 var btnRefresh = $('.btn-refresh');
-var btnRefreshHTML = '<i class="fas fa-redo-alt" id="icon-refresh"></i>';
+var btnRefreshHTML = '<i class="fas fa-redo-alt" id="icon-refresh"></i>'; // Other DOM queries
+
 var imgContainer = $('#img-container');
-var loadedImg = $('#loaded-img');
+var loadedImg = $('#loaded-img'); // Image storage
+
 var displayedImg = null;
 var linkedImages = {};
 /**
  * Classes
  */
+// Image Details for displayedImg and linkedImages
 
 var ImageDetails = function ImageDetails(id, author, url, download_url, links) {
   _classCallCheck(this, ImageDetails);
@@ -36,8 +41,8 @@ var getImages = function getImages() {
   var getPicsum = picsumURL(randomPage);
   fetch(getPicsum).then(function (response) {
     return response.json();
-  }).then(pickRandomImage).then(loadImage).then(loadImageDetails)["catch"](function (err) {
-    return console.log(err);
+  }).then(pickRandomImage)["catch"](function (err) {
+    return errorHandler(err);
   });
 }; // Picks a random image from the fetched data
 
@@ -47,6 +52,8 @@ var pickRandomImage = function pickRandomImage(json) {
   var chosenImage = json[randomImage];
   var chosenImageLinks = checkLinks(chosenImage);
   displayedImg = new ImageDetails(chosenImage.id, chosenImage.author, chosenImage.url, chosenImage.download_url, chosenImageLinks);
+  loadImage();
+  loadImageDetails();
 }; // Checks how many times the displayed image has been linked
 
 
@@ -91,6 +98,10 @@ var newImage = function newImage() {
     this.remove();
     getImages();
   });
+};
+
+var errorHandler = function errorHandler(err) {
+  imgContainer.html("\n        <div style=\"text-align: center\">\n            <h2>Something went wrong!</h2>\n            <span style=\"color: #ec3746\">".concat(err, "</span>\n        </div>\n    "));
 };
 /**
  * Other Functions

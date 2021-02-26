@@ -2,23 +2,27 @@
  * Variables
  */
 
+ // Picsum API
 const picsumURL = page => `https://picsum.photos/v2/list?page=${page}&limit=100`
 
+// Button DOM queries
 const btnLink = $('.btn-link')
 const btnRefresh = $('.btn-refresh')
 const btnRefreshHTML = '<i class="fas fa-redo-alt" id="icon-refresh"></i>'
 
+// Other DOM queries
 const imgContainer = $('#img-container')
 let loadedImg = $('#loaded-img')
 
+// Image storage
 let displayedImg = null
-
 let linkedImages = {}
 
 /**
  * Classes
  */
 
+ // Image Details for displayedImg and linkedImages
 const ImageDetails = class {
     constructor(id, author, url, download_url, links) {
         this.id = id,
@@ -40,9 +44,7 @@ const getImages = () => {
     fetch(getPicsum)
         .then(response => response.json())
         .then(pickRandomImage)
-        .then(loadImage)
-        .then(loadImageDetails)
-        .catch(err => console.log(err))
+        .catch(err => errorHandler(err))
 }
 
 // Picks a random image from the fetched data
@@ -51,6 +53,8 @@ const pickRandomImage = json => {
     const chosenImage = json[randomImage]
     const chosenImageLinks = checkLinks(chosenImage)
     displayedImg = new ImageDetails(chosenImage.id, chosenImage.author, chosenImage.url, chosenImage.download_url, chosenImageLinks)
+    loadImage()
+    loadImageDetails()
 }
 
 // Checks how many times the displayed image has been linked
@@ -110,6 +114,15 @@ const newImage = () => {
         this.remove()
         getImages()
     })
+}
+
+const errorHandler = err => {
+    imgContainer.html(`
+        <div style="text-align: center">
+            <h2>Something went wrong!</h2>
+            <span style="color: #ec3746">${err}</span>
+        </div>
+    `)
 }
 
 /**
