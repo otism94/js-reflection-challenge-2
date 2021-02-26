@@ -20,12 +20,12 @@ let linkedImages = {}
  */
 
 const ImageDetails = class {
-    constructor(id, author, url, download_url) {
+    constructor(id, author, url, download_url, links) {
         this.id = id,
         this.author = author,
         this.url = url,
         this.download_url = download_url,
-        this.links = []
+        this.links = links
     }
 }
 
@@ -42,21 +42,34 @@ const getImages = () => {
         .then(pickRandomImage)
         .then(loadImage)
         .then(loadImageDetails)
-        .then(checkLinks)
         .catch(err => console.log(err))
 }
 
-// Picks a random image from the fetched array
+// Picks a random image from the fetched data
 const pickRandomImage = json => {
     let randomImage = Math.floor(Math.random() * 99)
     const chosenImage = json[randomImage]
-    const imageInfo = new ImageDetails(chosenImage.id, chosenImage.author, chosenImage.url, chosenImage.download_url, 0)
-    displayedImg = imageInfo
-    return imageInfo
+    const chosenImageLinks = checkLinks(chosenImage)
+    displayedImg = new ImageDetails(chosenImage.id, chosenImage.author, chosenImage.url, chosenImage.download_url, chosenImageLinks)
+}
+
+// Checks how many times the displayed image has been linked
+const checkLinks = img => {
+    if (!jQuery.isEmptyObject(linkedImages)) {
+        for (const id in linkedImages) {
+            if (linkedImages[id].links.length > 0 && id === img.id) {
+                return linkedImages[id].links
+            } else {
+                return []
+            }
+        }
+    } else {
+        return []
+    }
 }
 
 // Fades in the image once it's fully loaded
-const loadImage = src => {
+const loadImage = () => {
     const img = new Image()
     img.onload = () => {
         btnRefresh.html(`${btnRefreshHTML}New Image`)
@@ -69,41 +82,26 @@ const loadImage = src => {
         loadedImg.fadeIn(500)
     }
     img.id = 'loaded-img'
-    img.src = src.download_url
-    return src
+    img.src = displayedImg.download_url
 }
 
 // Retrieves image details from object and displays in sidebar
-const loadImageDetails = obj => {
+const loadImageDetails = () => {
     $('#photo-info').html(`
         <div id="photo-heading">
             <div id="photo-id">
                 <h2>Image</h2>
-                <span>${obj.id}</span>
+                <span>${displayedImg.id}</span>
             </div>
             <div id="links-count">
-                <i class="fas fa-link" id="icon-link"></i> ${obj.links.length}
+                <i class="fas fa-link" id="icon-link"></i> ${displayedImg.links.length}
             </div>
         </div>
         <ul id="info-list">
-            <li><i class="fas fa-user-circle"></i>${obj.author}</li>
-            <li><i class="fab fa-unsplash"></i><a href="${obj.url}" target="_blank">View this image on Unsplash</a></li>
+            <li><i class="fas fa-user-circle"></i>${displayedImg.author}</li>
+            <li><i class="fab fa-unsplash"></i><a href="${displayedImg.url}" target="_blank">View this image on Unsplash</a></li>
         </li>
     `)
-    return obj
-}
-
-// Checks how many times the displayed image has been linked
-const checkLinks = img => {
-    for (const id in linkedImages) {
-        if (id === img.id) {
-            const displayedImgLinks = linkedImages[id].links.length
-            $('#links-count').html(`
-                <i class="fas fa-link" id="icon-link"></i> ${displayedImgLinks}
-            `)
-            break
-        }
-    }
 }
 
 // Removes image and loads a new one
@@ -142,18 +140,17 @@ $(document).ready(() => {
 })
 
 // 'Link Image' button click
-btnLink.on('click', function() {
-    linkedImages[displayedImg.id] = displayedImg
+btnLink.on('click', () => {
     const inputEmail = prompt('Enter an email address')
+    linkedImages[displayedImg.id] = displayedImg
     linkedImages[displayedImg.id].links.push(inputEmail)
-    const displayedImgLinks = linkedImages[displayedImg.id].links.length
     $('#links-count').html(`
-        <i class="fas fa-link" id="icon-link"></i> ${displayedImgLinks}
+        <i class="fas fa-link" id="icon-link"></i> ${linkedImages[displayedImg.id].links.length}
     `)
 })
 
 // 'New Image' button click
-btnRefresh.on('click', function() {
+btnRefresh.on('click', () => {
     newImage()
     btnRefresh.html(`${btnRefreshHTML}Loading...`)
         .addClass('loading')

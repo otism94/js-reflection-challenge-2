@@ -20,10 +20,10 @@ var linkedImages = {};
  * Classes
  */
 
-var ImageDetails = function ImageDetails(id, author, url, download_url) {
+var ImageDetails = function ImageDetails(id, author, url, download_url, links) {
   _classCallCheck(this, ImageDetails);
 
-  this.id = id, this.author = author, this.url = url, this.download_url = download_url, this.links = [];
+  this.id = id, this.author = author, this.url = url, this.download_url = download_url, this.links = links;
 };
 /**
  * Image Functions
@@ -36,22 +36,36 @@ var getImages = function getImages() {
   var getPicsum = picsumURL(randomPage);
   fetch(getPicsum).then(function (response) {
     return response.json();
-  }).then(pickRandomImage).then(loadImage).then(loadImageDetails).then(checkLinks)["catch"](function (err) {
+  }).then(pickRandomImage).then(loadImage).then(loadImageDetails)["catch"](function (err) {
     return console.log(err);
   });
-}; // Picks a random image from the fetched array
+}; // Picks a random image from the fetched data
 
 
 var pickRandomImage = function pickRandomImage(json) {
   var randomImage = Math.floor(Math.random() * 99);
   var chosenImage = json[randomImage];
-  var imageInfo = new ImageDetails(chosenImage.id, chosenImage.author, chosenImage.url, chosenImage.download_url, 0);
-  displayedImg = imageInfo;
-  return imageInfo;
+  var chosenImageLinks = checkLinks(chosenImage);
+  displayedImg = new ImageDetails(chosenImage.id, chosenImage.author, chosenImage.url, chosenImage.download_url, chosenImageLinks);
+}; // Checks how many times the displayed image has been linked
+
+
+var checkLinks = function checkLinks(img) {
+  if (!jQuery.isEmptyObject(linkedImages)) {
+    for (var id in linkedImages) {
+      if (linkedImages[id].links.length > 0 && id === img.id) {
+        return linkedImages[id].links;
+      } else {
+        return [];
+      }
+    }
+  } else {
+    return [];
+  }
 }; // Fades in the image once it's fully loaded
 
 
-var loadImage = function loadImage(src) {
+var loadImage = function loadImage() {
   var img = new Image();
 
   img.onload = function () {
@@ -63,25 +77,12 @@ var loadImage = function loadImage(src) {
   };
 
   img.id = 'loaded-img';
-  img.src = src.download_url;
-  return src;
+  img.src = displayedImg.download_url;
 }; // Retrieves image details from object and displays in sidebar
 
 
-var loadImageDetails = function loadImageDetails(obj) {
-  $('#photo-info').html("\n        <div id=\"photo-heading\">\n            <div id=\"photo-id\">\n                <h2>Image</h2>\n                <span>".concat(obj.id, "</span>\n            </div>\n            <div id=\"links-count\">\n                <i class=\"fas fa-link\" id=\"icon-link\"></i> ").concat(obj.links.length, "\n            </div>\n        </div>\n        <ul id=\"info-list\">\n            <li><i class=\"fas fa-user-circle\"></i>").concat(obj.author, "</li>\n            <li><i class=\"fab fa-unsplash\"></i><a href=\"").concat(obj.url, "\" target=\"_blank\">View this image on Unsplash</a></li>\n        </li>\n    "));
-  return obj;
-}; // Checks how many times the displayed image has been linked
-
-
-var checkLinks = function checkLinks(img) {
-  for (var id in linkedImages) {
-    if (id === img.id) {
-      var displayedImgLinks = linkedImages[id].links.length;
-      $('#links-count').html("\n                <i class=\"fas fa-link\" id=\"icon-link\"></i> ".concat(displayedImgLinks, "\n            "));
-      break;
-    }
-  }
+var loadImageDetails = function loadImageDetails() {
+  $('#photo-info').html("\n        <div id=\"photo-heading\">\n            <div id=\"photo-id\">\n                <h2>Image</h2>\n                <span>".concat(displayedImg.id, "</span>\n            </div>\n            <div id=\"links-count\">\n                <i class=\"fas fa-link\" id=\"icon-link\"></i> ").concat(displayedImg.links.length, "\n            </div>\n        </div>\n        <ul id=\"info-list\">\n            <li><i class=\"fas fa-user-circle\"></i>").concat(displayedImg.author, "</li>\n            <li><i class=\"fab fa-unsplash\"></i><a href=\"").concat(displayedImg.url, "\" target=\"_blank\">View this image on Unsplash</a></li>\n        </li>\n    "));
 }; // Removes image and loads a new one
 
 
@@ -120,11 +121,10 @@ $(document).ready(function () {
 }); // 'Link Image' button click
 
 btnLink.on('click', function () {
-  linkedImages[displayedImg.id] = displayedImg;
   var inputEmail = prompt('Enter an email address');
+  linkedImages[displayedImg.id] = displayedImg;
   linkedImages[displayedImg.id].links.push(inputEmail);
-  var displayedImgLinks = linkedImages[displayedImg.id].links.length;
-  $('#links-count').html("\n        <i class=\"fas fa-link\" id=\"icon-link\"></i> ".concat(displayedImgLinks, "\n    "));
+  $('#links-count').html("\n        <i class=\"fas fa-link\" id=\"icon-link\"></i> ".concat(linkedImages[displayedImg.id].links.length, "\n    "));
 }); // 'New Image' button click
 
 btnRefresh.on('click', function () {
