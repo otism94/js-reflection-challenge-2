@@ -1,0 +1,21 @@
+// Theme Color mixin
+// Sets default and hover state colours
+@mixin theme-color($map, $type: bg) {
+    @if $type == bg {
+        background-color: map-get($map, "default");
+
+        &:hover {
+            background-color: map-get($map, "hover");
+        }
+
+    } @else if $type == font {
+        color: map-get($map, "default");
+        
+        &:hover {
+            color: map-get($map, "hover");
+        }
+
+    } @else {
+        @error "Unknown property '#{$type}' Use one of the following properties: bg, font";
+    }
+}

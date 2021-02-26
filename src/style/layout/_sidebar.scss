@@ -1,20 +1,53 @@
 #sidebar {
+    order: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     position: relative;
     z-index: 1000;
     min-width: 300px;
-    background-color: #d4d4d4;
+    height: auto;
+    background-color: $bg-light;
     padding: 5px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+
     #sidebar-content {
         padding: 0 10px;
-        ul {
-            color: #307ce0;
+
+        #photo-info {
+            #photo-id {
+                display: flex;
+                align-items: center;
+                h2 {
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+                span {
+                    font-size: 18px;
+                    color: $text-lighter;
+                    background-color: $white;
+                    border: 2px solid rgba(0, 0, 0, .2);
+                    border-radius: 3px;
+                    padding: 0 5px;
+                }
+            }
+
             li {
-                margin-bottom: 10px;
-                &:hover {
-                    cursor: pointer;
+                line-height: 1.5em;
+
+                .fa-user-circle {
+                    margin-right: 5px;
+                }
+
+                .fa-unsplash {
+                    margin-right: 6.5px;
+                }
+
+                a {
+                    @include theme-color($blue, font);
+                    text-decoration: none;
                 }
             }
         }

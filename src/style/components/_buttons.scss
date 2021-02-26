@@ -1,22 +1,37 @@
-#btn-refresh {
-    width: 100%;
-    height: 52px;
-    background-color: #29db29;
-    color: white;
-    margin: 3px 0 10px;
+.btn {
+    position: relative;
     border: none;
     border-radius: 3px;
+    width: 100%;
+    height: 52px;
+    color: white;
+    margin: 3px 0 10px;
+    transition: background-color .5s;
+
     &:hover {
-        background-color: #27c227;
         cursor: pointer;
     }
-    &:focus {
-        outline: none;
+
+    .fas {
+        position: absolute;
+        left: 70px;
     }
-    span {
-        margin-left: -24px;
-    }
-    i {
-        margin-right: 8px;
+
+}
+
+.btn-link {
+    @include theme-color($blue, bg);
+}
+
+.btn-refresh {
+    @include theme-color($green, bg);
+}
+
+.loading {
+    background-color: $text-lighter;
+    transition: background-color .5s;
+    &:hover {
+        background-color: $text-lighter;
+        cursor: default;
     }
 }

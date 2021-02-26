@@ -5,23 +5,24 @@ header {
     z-index: 1000;
     height: 100px;
     padding: 10px 20px 10px 0;
-    background-color: #1a1d22;
+    background: linear-gradient(to top, $bg-dark 0%, lighten($bg-dark, 1%) 50%, $bg-dark 100%);
+
     #header-title {
         display: flex;
         justify-content: center;
         align-items: center;
         width: 300px;
         margin-right: 8px;
+
         i {
-            color: #fff;
             font-size: 42px;
+            color: $white;
             margin-right: 8px;
         }
     }
+
     #tagline {
+        color: $text-lightest;
         margin-top: 10px;
-        color: #dadada;
     }
 }
-
-// #4f95ce

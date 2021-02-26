@@ -1,3 +1,27 @@
 // Font stacks
 $heading: 'Akaya Telivigala', 'Helvetica', 'Arial', cursive;
 $body: 'ABeeZee', 'Helvetica', 'Arial', sans-serif;
+
+// Colours
+$white: #fff;
+$bg-dark: #1a1d22;
+$bg-light: #d4d4d4;
+
+$text-primary: #6b6b6b;
+$text-lighter: #8b8b8b;
+$text-lightest: #dadada;
+
+$red: (
+    "default": #ec3746,
+    "hover": #c7202e
+);
+
+$green: (
+    "default": #29db29,
+    "hover": #27c227
+);
+
+$blue: (
+    "default": #307ce0,
+    "hover": #2366bd
+);
