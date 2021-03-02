@@ -8,18 +8,31 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // Picsum API
 var picsumURL = function picsumURL(page) {
   return "https://picsum.photos/v2/list?page=".concat(page, "&limit=100");
-}; // Button DOM queries
+}; // Main page DOM queries
 
 
+var linkBox = $('#modal-link-box');
+var imgContainer = $('#img-container');
+var loadedImg = $('#loaded-img');
 var btnLink = $('.btn-link');
 var btnRefresh = $('.btn-refresh');
-var btnRefreshHTML = '<i class="fas fa-redo-alt" id="icon-refresh"></i>'; // Other DOM queries
+var btnRefreshHTML = '<i class="fas fa-redo-alt" id="icon-refresh"></i>'; // Modal box DOM queries
 
-var imgContainer = $('#img-container');
-var loadedImg = $('#loaded-img'); // Image storage
+var emailField = $('#user-email-field');
+var linkStatus = $('#status');
+var btnPastEmail = $('.btn-past-email');
+var btnCancel = $('.btn-cancel');
+var btnLinkIt = $('.btn-linkit'); // Image storage
 
 var displayedImg = null;
-var linkedImages = {};
+var linkedImages = {}; // Email storage
+
+var savedEmails = {};
+var lastUsedEmail = null; // State trackers
+
+var modalVisible = false; // Email format regex
+
+var mailFormat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 /**
  * Classes
  */
@@ -41,7 +54,7 @@ var getImages = function getImages() {
   var getPicsum = picsumURL(randomPage);
   fetch(getPicsum).then(function (response) {
     return response.json();
-  }).then(pickRandomImage)["catch"](function (err) {
+  }).then(pickRandomImage).then($('#error').remove())["catch"](function (err) {
     return errorHandler(err);
   });
 }; // Picks a random image from the fetched data
@@ -98,10 +111,87 @@ var newImage = function newImage() {
     this.remove();
     getImages();
   });
-};
+}; // Display error on page
+
 
 var errorHandler = function errorHandler(err) {
-  imgContainer.html("\n        <div style=\"text-align: center\">\n            <h2>Something went wrong!</h2>\n            <span style=\"color: #ec3746\">".concat(err, "</span>\n        </div>\n    "));
+  imgContainer.html("\n        <div id=\"error\" style=\"text-align: center\">\n            <h2>Something went wrong!</h2>\n            <span style=\"color: #ec3746\">".concat(err, "</span>\n        </div>\n    "));
+};
+/**
+ * Email linking functions
+ */
+// Link email
+
+
+var linkEmail = function linkEmail(email) {
+  var isNewEmail = true;
+  var alreadyLinked = false;
+
+  for (savedEmail in savedEmails) {
+    if (savedEmail === email) {
+      isNewEmail = false;
+      break;
+    }
+  }
+
+  if (isNewEmail) {
+    savedEmails["".concat(email)] = [displayedImg];
+  } else {
+    for (var i = 0; i < savedEmails["".concat(email)].length; i++) {
+      if (savedEmails["".concat(email)][i].id === displayedImg.id) {
+        alreadyLinked = true;
+        break;
+      }
+    }
+
+    if (!alreadyLinked) {
+      savedEmails["".concat(email)].push(displayedImg);
+    } else {
+      emailField.focus();
+      linkStatus.addClass('fail').html("\n                    <i class=\"fas fa-exclamation-circle\"></i> Email already linked!\n                ");
+      btnLinkIt.removeAttr('disabled');
+    }
+  }
+
+  return alreadyLinked;
+}; // Link image
+
+
+var linkImage = function linkImage(inputEmail) {
+  var isValid = validateEmail(inputEmail);
+
+  if (!isValid) {
+    emailField.focus();
+    linkStatus.addClass('fail').html("\n                <i class=\"fas fa-exclamation-circle\"></i> Invalid email! Try again.\n            ");
+    btnLinkIt.removeAttr('disabled');
+  } else {
+    var alreadyLinked = linkEmail(inputEmail);
+
+    if (!alreadyLinked) {
+      linkedImages[displayedImg.id] = displayedImg;
+      linkedImages[displayedImg.id].links.push(inputEmail);
+      $('#links-count').html("\n                <i class=\"fas fa-link\" id=\"icon-link\"></i> ".concat(linkedImages[displayedImg.id].links.length, "\n            "));
+      lastUsedEmail = inputEmail;
+      linkStatus.removeClass('fail').addClass('success').html("\n                    <i class=\"fas fa-exclamation-circle\"></i> Linked!\n                ");
+      setTimeout(function () {
+        linkBox.fadeOut(500, function () {
+          linkStatus.removeClass('success').html('');
+          emailField.val('');
+          btnLinkIt.removeAttr('disabled');
+          modalVisible = false;
+        });
+      }, 1000);
+    }
+  }
+}; // Email validator
+
+
+var validateEmail = function validateEmail(email) {
+  if (email.match(mailFormat) && email.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
 };
 /**
  * Other Functions
@@ -112,7 +202,10 @@ var errorHandler = function errorHandler(err) {
 var logoColor = function logoColor() {
   var hue = 0;
   setInterval(function () {
-    $('#icon-logo').css('color', "hsl(".concat(hue, ", 90%, 60%)")).css('text-shadow', "0 0 5px hsl(".concat(hue, ", 90%, 60%)"));
+    $('#icon-logo').css({
+      'color': "hsl(".concat(hue, ", 90%, 60%)"),
+      'text-shadow': "0 0 5px hsl(".concat(hue, ", 90%, 60%)")
+    });
     hue++;
 
     if (hue === 360) {
@@ -129,16 +222,59 @@ var logoColor = function logoColor() {
 $(document).ready(function () {
   getImages();
   logoColor();
-}); // 'Link Image' button click
+}); // 'Link Image' button
 
 btnLink.on('click', function () {
-  var inputEmail = prompt('Enter an email address');
-  linkedImages[displayedImg.id] = displayedImg;
-  linkedImages[displayedImg.id].links.push(inputEmail);
-  $('#links-count').html("\n        <i class=\"fas fa-link\" id=\"icon-link\"></i> ".concat(linkedImages[displayedImg.id].links.length, "\n    "));
-}); // 'New Image' button click
+  if (!modalVisible) {
+    modalVisible = true;
+    linkBox.fadeIn(500);
+    emailField.focus();
+
+    if (lastUsedEmail !== null) {
+      $('#past-email').show();
+      btnPastEmail.html("".concat(lastUsedEmail));
+    }
+  } else if (modalVisible) {
+    linkBox.fadeOut(500, function () {
+      emailField.val('');
+      linkStatus.removeClass('fail').html('');
+      modalVisible = false;
+    });
+  }
+}); // Modal 'Link to Previous Email' button
+
+btnPastEmail.on('click', function () {
+  linkImage(lastUsedEmail);
+}); // Modal 'Cancel' button
+
+btnCancel.on('click', function () {
+  linkBox.fadeOut(500, function () {
+    emailField.val('');
+    linkStatus.removeClass('fail').html('');
+    modalVisible = false;
+  });
+}); // Modal 'Link It' button
+
+btnLinkIt.on('click', function () {
+  btnLinkIt.attr('disabled', 'disabled');
+  var inputEmail = emailField.val();
+  linkImage(inputEmail);
+}); // User presses enter to Link It
+
+emailField.keyup(function (event) {
+  if (event.keyCode === 13) {
+    btnLinkIt.click();
+  }
+}); // 'New Image' button
 
 btnRefresh.on('click', function () {
+  if (modalVisible) {
+    linkBox.fadeOut(500, function () {
+      linkStatus.removeClass('fail').html('');
+      modalVisible = false;
+    });
+  }
+
   newImage();
   btnRefresh.html("".concat(btnRefreshHTML, "Loading...")).addClass('loading').attr('disabled', 'disabled');
   btnLink.addClass('loading').attr('disabled', 'disabled');

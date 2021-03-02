@@ -11,7 +11,8 @@
         'base/base';
 
 // Component Styles
-@import 'components/buttons'; 
+@import 'components/modals',
+        'components/buttons'; 
 
 // Layout Styles
 @import 'layout/header',

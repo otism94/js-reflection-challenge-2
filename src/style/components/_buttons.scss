@@ -12,19 +12,45 @@
         cursor: pointer;
     }
 
+    &:focus {
+        box-shadow: 0 0 5px rgba(0, 0, 0, .5);
+    }
+}
+
+.btn-link, .btn-linkit {
+    @include theme-color($blue, bg);
+}
+
+.btn-link, .btn-refresh {
     .fas {
         position: absolute;
         left: 70px;
     }
-
-}
-
-.btn-link {
-    @include theme-color($blue, bg);
 }
 
 .btn-refresh {
     @include theme-color($green, bg);
+}
+
+.btn-past-email {
+    width: 290px;
+    height: 42px;
+    border: none;
+    border-radius: 3px;
+    color: $white;
+    margin: 0 0 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    @include theme-color($green, bg);
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.btn-cancel {
+    @include theme-color($red, bg)
 }
 
 .loading {

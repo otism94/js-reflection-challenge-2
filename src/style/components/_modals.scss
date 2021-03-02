@@ -1,0 +1,92 @@
+#modal-link-box {
+    display: none;
+
+    #pointer {
+        position: absolute;
+        left: 295px;
+        top: 123px;
+        z-index: 2001;
+        width: 20px;
+        height: 20px;
+        transform: rotate(45deg);
+        background: linear-gradient(45deg, rgba(107, 107, 107, .9) 50%, transparent 50%);
+    }
+    
+    #link-input {
+        position: absolute;
+        z-index: 2000;
+        top: 108px;
+        left: 305px;
+        background-color: rgba(107, 107, 107, .9);
+        width: 300px;
+        border-radius: 3px;
+        padding: 5px;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, .25);
+    
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: bold;
+            color: $white;
+            margin: 0;
+            padding: 10px;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    
+        #past-email {
+            display: none;
+        }
+    
+        #new-email {
+            #user-email-field {
+                width: 290px;
+                height: 42px;
+                border-radius: 3px;
+                line-height: 1.15;
+                border: none;
+                background-color: $white;
+                margin-bottom: 10px;
+                color: $text-primary;
+                text-align: center;
+        
+                &::placeholder {
+                    color: rgba(0, 0, 0, .25);
+                }
+
+                &:focus {
+                    outline: none;
+                    border: 1px solid map-get($green, "default");
+                    box-shadow: 0 0 3px map-get($green, "default");
+                }
+            }
+    
+            #input-buttons {
+                display: flex;
+                flex-wrap: nowrap;
+                justify-content: space-between;
+    
+                .btn-linkit,
+                .btn-cancel {
+                    position: relative;
+                    width: 143px;
+                    height: 42px;
+                    opacity: 1;
+                    .fas {
+                        margin-right: 5px;
+                    }
+                }
+            }
+        }
+
+        #status.success {
+            color: map-get($green, "default");
+        }
+
+        #status.fail {
+            color: map-get($red, "default");
+        }
+    }
+}

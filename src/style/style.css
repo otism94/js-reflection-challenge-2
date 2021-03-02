@@ -138,6 +138,7 @@ body {
 
 main {
   display: flex;
+  position: relative;
   overflow: hidden;
   height: 100vh;
   margin-top: -100px;
@@ -156,9 +157,78 @@ h1 {
   h1:hover {
     cursor: default; }
 
+a:focus {
+  text-shadow: 0 0 3px rgba(8, 231, 247, 0.5); }
+
 ul {
   list-style: none;
   padding: 0; }
+
+#modal-link-box {
+  display: none; }
+  #modal-link-box #pointer {
+    position: absolute;
+    left: 295px;
+    top: 123px;
+    z-index: 2001;
+    width: 20px;
+    height: 20px;
+    transform: rotate(45deg);
+    background: linear-gradient(45deg, rgba(107, 107, 107, 0.9) 50%, transparent 50%); }
+  #modal-link-box #link-input {
+    position: absolute;
+    z-index: 2000;
+    top: 108px;
+    left: 305px;
+    background-color: rgba(107, 107, 107, 0.9);
+    width: 300px;
+    border-radius: 3px;
+    padding: 5px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.25); }
+    #modal-link-box #link-input label {
+      display: block;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      margin: 0;
+      padding: 10px; }
+      #modal-link-box #link-input label:hover {
+        cursor: pointer; }
+    #modal-link-box #link-input #past-email {
+      display: none; }
+    #modal-link-box #link-input #new-email #user-email-field {
+      width: 290px;
+      height: 42px;
+      border-radius: 3px;
+      line-height: 1.15;
+      border: none;
+      background-color: #fff;
+      margin-bottom: 10px;
+      color: #6b6b6b;
+      text-align: center; }
+      #modal-link-box #link-input #new-email #user-email-field::placeholder {
+        color: rgba(0, 0, 0, 0.25); }
+      #modal-link-box #link-input #new-email #user-email-field:focus {
+        outline: none;
+        border: 1px solid #29db29;
+        box-shadow: 0 0 3px #29db29; }
+    #modal-link-box #link-input #new-email #input-buttons {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-between; }
+      #modal-link-box #link-input #new-email #input-buttons .btn-linkit,
+      #modal-link-box #link-input #new-email #input-buttons .btn-cancel {
+        position: relative;
+        width: 143px;
+        height: 42px;
+        opacity: 1; }
+        #modal-link-box #link-input #new-email #input-buttons .btn-linkit .fas,
+        #modal-link-box #link-input #new-email #input-buttons .btn-cancel .fas {
+          margin-right: 5px; }
+    #modal-link-box #link-input #status.success {
+      color: #29db29; }
+    #modal-link-box #link-input #status.fail {
+      color: #ec3746; }
 
 .btn {
   position: relative;
@@ -171,19 +241,43 @@ ul {
   transition: background-color .5s; }
   .btn:hover {
     cursor: pointer; }
-  .btn .fas {
-    position: absolute;
-    left: 70px; }
+  .btn:focus {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); }
 
-.btn-link {
+.btn-link, .btn-linkit {
   background-color: #307ce0; }
-  .btn-link:hover {
+  .btn-link:hover, .btn-linkit:hover {
     background-color: #2366bd; }
+
+.btn-link .fas, .btn-refresh .fas {
+  position: absolute;
+  left: 70px; }
 
 .btn-refresh {
   background-color: #29db29; }
   .btn-refresh:hover {
     background-color: #27c227; }
+
+.btn-past-email {
+  width: 290px;
+  height: 42px;
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  margin: 0 0 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background-color: #29db29; }
+  .btn-past-email:hover {
+    background-color: #27c227; }
+  .btn-past-email:hover {
+    cursor: pointer; }
+
+.btn-cancel {
+  background-color: #ec3746; }
+  .btn-cancel:hover {
+    background-color: #c7202e; }
 
 .loading {
   background-color: #8b8b8b;
@@ -220,7 +314,6 @@ header {
   flex-direction: column;
   justify-content: space-between;
   position: relative;
-  z-index: 1000;
   min-width: 300px;
   height: auto;
   background-color: #d4d4d4;

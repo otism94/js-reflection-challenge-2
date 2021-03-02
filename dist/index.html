@@ -45,10 +45,10 @@
 
             <div id="sidebar">
                 <div id="sidebar-content">
-                    <button class="btn btn-link">
+                    <button type="button" class="btn btn-link">
                         <i class="fas fa-link" id="icon-link"></i>Link Image
                     </button>
-                    <button class="btn btn-refresh">
+                    <button type="button" class="btn btn-refresh">
                         <i class="fas fa-redo-alt" id="icon-refresh"></i>New Image
                     </button>
                     <div id="photo-info">
@@ -63,6 +63,26 @@
                     </ul>
                 </footer>
             </div>
+
+            <div id="modal-link-box">
+                <div id="pointer"></div>
+                <div id="link-input">
+                    <div id="past-email">
+                        <label for="btn-past-email">Link to previous email:</label>
+                        <button type="submit" id="btn-past-email" class="btn btn-past-email"></button>
+                    </div>
+                    <div id="new-email">
+                        <label for="user-email-field">Link to a new email:</label>
+                        <input type="email" id="user-email-field" name="user_email" placeholder="Your email here..."/><br/>
+                        <div id="input-buttons">
+                            <button class="btn btn-cancel"><i class="fas fa-times"></i>Cancel</button>
+                            <button type="submit" class="btn btn-linkit"><i class="fas fa-check"></i>Link It</button>
+                        </div>
+                    </div>
+                    <span id="status"></span>
+                </div>
+            </div>
+
         </main>
 
         <!-- JavaScript -->

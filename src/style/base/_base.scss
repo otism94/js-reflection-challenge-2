@@ -1,6 +1,5 @@
 * {
     box-sizing: border-box;
-
     &:focus {
         outline: none;
     }
@@ -16,6 +15,7 @@ body {
 
 main {
     display: flex;
+    position: relative;
     overflow: hidden;
     height: 100vh;
     margin-top: -100px;
@@ -35,6 +35,10 @@ h1 {
     &:hover {
         cursor: default;
     }
+}
+
+a:focus {
+    text-shadow: 0 0 3px rgba(8, 231, 247, 0.5);
 }
 
 ul {
