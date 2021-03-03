@@ -1,6 +1,11 @@
 footer {
+    display: none;
     font-size: 14px;
     color: $text-lighter;
+
+    @include mq('md') {
+        display: block;
+    }
 
     ul {
         text-align: center;

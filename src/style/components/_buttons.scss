@@ -22,9 +22,24 @@
 }
 
 .btn-link, .btn-refresh {
+    @include mq('xs') {
+        width: 100%;
+    }
+    @include mq('sm') {
+        width: 155px;
+        margin: 3px 0 10px;
+    }
+    @include mq('md') {
+        width: 100%;
+    }
     .fas {
-        position: absolute;
-        left: 70px;
+        margin-right: 10px;
+        @include mq('md') {
+            position: absolute;
+            left: 70px;
+            top: 16px;
+            margin-right: 0;
+        }
     }
 }
 

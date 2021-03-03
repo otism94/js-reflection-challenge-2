@@ -28,9 +28,6 @@ let linkedImages = {}
 const savedEmails = {}
 let lastUsedEmail = null
 
-// State trackers
-let modalVisible = false
-
 // Email format regex
 const mailFormat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
 
@@ -57,17 +54,18 @@ const ImageDetails = class {
 const getImages = () => {
     const randomPage = Math.floor(Math.random() * (10) + 1)
     const getPicsum = picsumURL(randomPage)
-    fetch(getPicsum)
-        .then(response => response.json())
-        .then(pickRandomImage)
-        .then($('#error').remove())
+    axios.get(getPicsum)
+        .then(response => {
+            pickRandomImage(response.data)
+            $('#error').remove()
+        })
         .catch(err => errorHandler(err))
 }
 
 // Picks a random image from the fetched data
-const pickRandomImage = json => {
-    let randomImage = Math.floor(Math.random() * 99)
-    const chosenImage = json[randomImage]
+const pickRandomImage = array => {
+    const randomImage = Math.floor(Math.random() * (array.length - 1))
+    const chosenImage = array[randomImage]
     const chosenImageLinks = checkLinks(chosenImage)
     displayedImg = new ImageDetails(chosenImage.id, chosenImage.author, chosenImage.url, chosenImage.download_url, chosenImageLinks)
     loadImage()
@@ -127,8 +125,8 @@ const loadImageDetails = () => {
 
 // Removes image and loads a new one
 const newImage = () => {
-    loadedImg.fadeOut(500, function() {
-        this.remove()
+    loadedImg.fadeOut(500, () => {
+        loadedImg.remove()
         getImages()
     })
 }
@@ -136,9 +134,9 @@ const newImage = () => {
 // Display error on page
 const errorHandler = err => {
     imgContainer.html(`
-        <div id="error" style="text-align: center">
+        <div id="error">
             <h2>Something went wrong!</h2>
-            <span style="color: #ec3746">${err}</span>
+            <span>${err}</span>
         </div>
     `)
 }
@@ -151,7 +149,7 @@ const errorHandler = err => {
 const linkEmail = email => {
     let isNewEmail = true
     let alreadyLinked = false
-    for (savedEmail in savedEmails) {
+    for (let savedEmail in savedEmails) {
         if (savedEmail === email) {
             isNewEmail = false
             break
@@ -174,6 +172,7 @@ const linkEmail = email => {
                 .html(`
                     <i class="fas fa-exclamation-circle"></i> Email already linked!
                 `)
+            btnCancel.removeAttr('disabled')
             btnLinkIt.removeAttr('disabled')
         }
     }
@@ -205,13 +204,7 @@ const linkImage = inputEmail => {
                     <i class="fas fa-exclamation-circle"></i> Linked!
                 `)
             setTimeout(() => {
-                linkBox.fadeOut(500, () => {
-                    linkStatus.removeClass('success')
-                        .html('')
-                    emailField.val('')
-                    btnLinkIt.removeAttr('disabled')
-                    modalVisible = false
-                })
+                modalFade('out')
             }, 1000)
         }
     }
@@ -245,6 +238,26 @@ const logoColor = () => {
     }, 10)
 }
 
+// Modal fade
+const modalFade = dest => {
+    if (dest === 'in') {
+        linkBox.fadeIn(500)
+        emailField.focus()
+        if (lastUsedEmail !== null) {
+            $('#past-email').show()
+            btnPastEmail.html(`${lastUsedEmail}`)
+        }
+    } else if (dest === 'out') {
+        linkBox.fadeOut(500, () => {
+            emailField.val('')
+            btnCancel.removeAttr('disabled')
+            btnLinkIt.removeAttr('disabled')
+            linkStatus.removeClass('success', 'fail')
+                .html('')
+        })
+    }
+}
+
 /**
  * Event Listeners
  */
@@ -257,41 +270,30 @@ $(document).ready(() => {
 
 // 'Link Image' button
 btnLink.on('click', () => {
-    if (!modalVisible) {
-        modalVisible = true
-        linkBox.fadeIn(500)
-        emailField.focus()
-        if (lastUsedEmail !== null) {
-            $('#past-email').show()
-            btnPastEmail.html(`${lastUsedEmail}`)
-        }
-    } else if (modalVisible) {
-        linkBox.fadeOut(500, () => {
-            emailField.val('')
-            linkStatus.removeClass('fail')
-                .html('')
-            modalVisible = false
-        })
+    modalFade('in')
+})
+
+linkBox.on('click', event => {
+    if (!Object.values($('#link-input').find('*')).includes(event.target)) {
+        modalFade('out')
     }
 })
 
 // Modal 'Link to Previous Email' button
 btnPastEmail.on('click', () => {
+    btnCancel.attr('disabled', 'disabled')
+    btnLinkIt.attr('disabled', 'disabled')
     linkImage(lastUsedEmail)
 })
 
 // Modal 'Cancel' button
 btnCancel.on('click', () => {
-    linkBox.fadeOut(500, () => {
-        emailField.val('')
-        linkStatus.removeClass('fail')
-            .html('')
-        modalVisible = false
-    })
+    modalFade('out')
 })
 
 // Modal 'Link It' button
 btnLinkIt.on('click', () => {
+    btnCancel.attr('disabled', 'disabled')
     btnLinkIt.attr('disabled', 'disabled')
     const inputEmail = emailField.val()
     linkImage(inputEmail)
@@ -306,13 +308,6 @@ emailField.keyup(event => {
 
 // 'New Image' button
 btnRefresh.on('click', () => {
-    if (modalVisible) {
-        linkBox.fadeOut(500, () => {
-            linkStatus.removeClass('fail')
-                .html('')
-            modalVisible = false
-        })
-    }
     newImage()
     btnRefresh.html(`${btnRefreshHTML}Loading...`)
         .addClass('loading')

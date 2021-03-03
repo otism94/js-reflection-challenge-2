@@ -1,18 +1,26 @@
 header {
     display: flex;
+    justify-content: center;
     align-items: center;
     position: relative;
     z-index: 1000;
     height: 100px;
-    padding: 10px 20px 10px 0;
+    padding: 10px 20px;
     background: linear-gradient(to top, $bg-dark 0%, lighten($bg-dark, 1%) 50%, $bg-dark 100%);
+    @include mq('md') {
+        justify-content: flex-start;
+        padding: 10px 20px 10px 0;
+    }
 
     #header-title {
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 300px;
+        width: auto;
         margin-right: 8px;
+        @include mq('md') {
+            width: 300px;
+        }
 
         i {
             font-size: 42px;
@@ -22,7 +30,11 @@ header {
     }
 
     #tagline {
+        display: none;
         color: $text-lightest;
         margin-top: 10px;
+        @include mq('md') {
+            display: inline;
+        }
     }
 }

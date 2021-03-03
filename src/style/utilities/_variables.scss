@@ -2,6 +2,14 @@
 $heading: 'Akaya Telivigala', 'Helvetica', 'Arial', cursive;
 $body: 'ABeeZee', 'Helvetica', 'Arial', sans-serif;
 
+// Media query breakpoints map
+$breakpoints: (
+    'xs': 767px,
+    'sm': 768px,
+    'md': 1024px,
+    'lg': 1440px,
+);
+
 // Colours
 $white: #fff;
 $bg-dark: #1a1d22;

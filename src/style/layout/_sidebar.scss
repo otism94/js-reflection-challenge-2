@@ -1,5 +1,5 @@
 #sidebar {
-    order: 1;
+    order: 2;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -8,28 +8,86 @@
     height: auto;
     background-color: $bg-light;
     padding: 5px;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    -ms-overflow-style: none;
+    @include mq('md') {
+        order: 1;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: none;
+    }
 
     #sidebar-content {
+        display: flex;
+        flex-direction: column;
         padding: 0 10px;
+        margin: auto;
+        @include mq('xs') {
+            width: 290px;
+        }
+        @include mq('sm') {
+            width: 340px;
+        }
+        @include mq('md') {
+            width: 100%;
+            margin: 0;
+        }
+
+        #sidebar-buttons {
+            display: block;
+            order: 2;
+            @include mq('sm') {
+                display: flex;
+                justify-content: space-between;
+            }
+            @include mq('md') {
+                display: block;
+                order: 1;
+            }
+        }
 
         #photo-info {
-            #photo-id {
+            order: 1;
+            @include mq('md') {
+                order: 2;
+            }
+            @include mq('lg') {
+                width: 100%;
+            }
+
+            #photo-heading {
                 display: flex;
                 align-items: center;
-                h2 {
-                    display: inline-block;
-                    margin-right: 10px;
+                margin-top: 10px;
+                @include mq('md') {
+                    display: block;
+                    margin-top: 0;
                 }
-                span {
-                    font-size: 18px;
-                    color: $text-lighter;
-                    background-color: $white;
-                    border: 2px solid rgba(0, 0, 0, .2);
-                    border-radius: 3px;
-                    padding: 0 5px;
+
+                #photo-id {
+                    display: flex;
+                    align-items: center;
+
+                    h2 {
+                        display: inline-block;
+                        margin: 5px 10px 5px 0;
+                        @include mq('md') {
+                            margin: 20px 10px 20px 0;
+                        }
+                    }
+                    span {
+                        font-size: 18px;
+                        color: $text-lighter;
+                        background-color: $white;
+                        border: 2px solid rgba(0, 0, 0, .2);
+                        border-radius: 3px;
+                        padding: 0 5px;
+                    }
+                }
+
+                #links-count {
+                    margin-left: 20px;
+                    @include mq('md') {
+                        margin: 0;
+                    }
                 }
             }
 
