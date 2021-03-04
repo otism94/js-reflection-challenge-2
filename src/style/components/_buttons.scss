@@ -1,11 +1,11 @@
 .btn {
     position: relative;
-    border: none;
-    border-radius: 3px;
     width: 100%;
     height: 52px;
-    color: white;
+    border: none;
+    border-radius: 3px;
     margin: 3px 0 10px;
+    color: $white;
     transition: background-color .5s;
 
     &:hover {
@@ -22,22 +22,20 @@
 }
 
 .btn-link, .btn-refresh {
-    @include mq('xs') {
-        width: 100%;
-    }
-    @include mq('sm') {
+    @include mq('md') {
         width: 155px;
         margin: 3px 0 10px;
     }
-    @include mq('md') {
+    @include mq('lg') {
         width: 100%;
     }
+
     .fas {
         margin-right: 10px;
-        @include mq('md') {
+        @include mq('lg') {
             position: absolute;
-            left: 70px;
             top: 16px;
+            left: 70px;
             margin-right: 0;
         }
     }
@@ -48,15 +46,11 @@
 }
 
 .btn-past-email {
-    width: 290px;
-    height: 42px;
-    border: none;
-    border-radius: 3px;
-    color: $white;
-    margin: 0 0 10px;
     overflow: hidden;
-    white-space: nowrap;
+    height: 42px;
+    margin: 0 0 10px;
     text-overflow: ellipsis;
+    white-space: nowrap;
     @include theme-color($green, bg);
 
     &:hover {
@@ -64,13 +58,25 @@
     }
 }
 
+.btn-linkit, .btn-cancel {
+    position: relative;
+    width: 142.5px;
+    height: 42px;
+    opacity: 1;
+
+    .fas {
+        margin-right: 5px;
+    }
+}
+
 .btn-cancel {
-    @include theme-color($red, bg)
+    @include theme-color($red, bg);
 }
 
 .loading {
     background-color: $text-lighter;
     transition: background-color .5s;
+    
     &:hover {
         background-color: $text-lighter;
         cursor: default;

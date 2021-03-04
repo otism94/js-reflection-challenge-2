@@ -7,7 +7,7 @@ header {
     height: 100px;
     padding: 10px 20px;
     background: linear-gradient(to top, $bg-dark 0%, lighten($bg-dark, 1%) 50%, $bg-dark 100%);
-    @include mq('md') {
+    @include mq('lg') {
         justify-content: flex-start;
         padding: 10px 20px 10px 0;
     }
@@ -18,7 +18,7 @@ header {
         align-items: center;
         width: auto;
         margin-right: 8px;
-        @include mq('md') {
+        @include mq('lg') {
             width: 300px;
         }
 
@@ -33,7 +33,7 @@ header {
         display: none;
         color: $text-lightest;
         margin-top: 10px;
-        @include mq('md') {
+        @include mq('lg') {
             display: inline;
         }
     }

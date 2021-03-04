@@ -3,7 +3,7 @@ footer {
     font-size: 14px;
     color: $text-lighter;
 
-    @include mq('md') {
+    @include mq('lg') {
         display: block;
     }
 

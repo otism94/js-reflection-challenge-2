@@ -113,7 +113,7 @@ const loadImageDetails = () => {
                 <span>${displayedImg.id}</span>
             </div>
             <div id="links-count">
-                <i class="fas fa-link" id="icon-link"></i> ${displayedImg.links.length}
+                <i class="fas fa-link"></i> ${displayedImg.links.length}
             </div>
         </div>
         <ul id="info-list">
@@ -131,7 +131,7 @@ const newImage = () => {
     })
 }
 
-// Display error on page
+// Display API request error on page
 const errorHandler = err => {
     imgContainer.html(`
         <div id="error">
@@ -172,8 +172,7 @@ const linkEmail = email => {
                 .html(`
                     <i class="fas fa-exclamation-circle"></i> Email already linked!
                 `)
-            btnCancel.removeAttr('disabled')
-            btnLinkIt.removeAttr('disabled')
+            modalBtnDisable('enable')
         }
     }
     return alreadyLinked
@@ -188,7 +187,7 @@ const linkImage = inputEmail => {
             .html(`
                 <i class="fas fa-exclamation-circle"></i> Invalid email! Try again.
             `)
-        btnLinkIt.removeAttr('disabled')
+        modalBtnDisable('enable')
     } else {
         const alreadyLinked = linkEmail(inputEmail)
         if (!alreadyLinked) {
@@ -250,11 +249,23 @@ const modalFade = dest => {
     } else if (dest === 'out') {
         linkBox.fadeOut(500, () => {
             emailField.val('')
-            btnCancel.removeAttr('disabled')
-            btnLinkIt.removeAttr('disabled')
+            modalBtnDisable('enable')
             linkStatus.removeClass('success', 'fail')
                 .html('')
         })
+    }
+}
+
+// Modal button disable/re-enable
+const modalBtnDisable = attr => {
+    if (attr === 'disable') {
+        btnPastEmail.attr('disabled', 'disabled')
+        btnCancel.attr('disabled', 'disabled')
+        btnLinkIt.attr('disabled', 'disabled')
+    } else if (attr === 'enable') {
+        btnPastEmail.removeAttr('disabled')
+        btnCancel.removeAttr('disabled')
+        btnLinkIt.removeAttr('disabled')
     }
 }
 
@@ -262,7 +273,7 @@ const modalFade = dest => {
  * Event Listeners
  */
 
-// Page open
+// Page load
 $(document).ready(() => {
     getImages()
     logoColor()
@@ -271,39 +282,6 @@ $(document).ready(() => {
 // 'Link Image' button
 btnLink.on('click', () => {
     modalFade('in')
-})
-
-linkBox.on('click', event => {
-    if (!Object.values($('#link-input').find('*')).includes(event.target)) {
-        modalFade('out')
-    }
-})
-
-// Modal 'Link to Previous Email' button
-btnPastEmail.on('click', () => {
-    btnCancel.attr('disabled', 'disabled')
-    btnLinkIt.attr('disabled', 'disabled')
-    linkImage(lastUsedEmail)
-})
-
-// Modal 'Cancel' button
-btnCancel.on('click', () => {
-    modalFade('out')
-})
-
-// Modal 'Link It' button
-btnLinkIt.on('click', () => {
-    btnCancel.attr('disabled', 'disabled')
-    btnLinkIt.attr('disabled', 'disabled')
-    const inputEmail = emailField.val()
-    linkImage(inputEmail)
-})
-
-// User presses enter to Link It
-emailField.keyup(event => {
-    if (event.keyCode === 13) {
-        btnLinkIt.click()
-    }
 })
 
 // 'New Image' button
@@ -321,4 +299,36 @@ btnRefresh.on('click', () => {
             $('#icon-refresh').css({transform: `rotate(${this.rotation}deg)`})
         }
     })
+})
+
+// Closes modal box when clicking outside it
+linkBox.on('click', event => {
+    if (!Object.values($('#link-input').find('*')).includes(event.target)) {
+        modalFade('out')
+    }
+})
+
+// Modal 'Link to Previous Email' button
+btnPastEmail.on('click', () => {
+    modalBtnDisable('disable')
+    linkImage(lastUsedEmail)
+})
+
+// Modal 'Cancel' button
+btnCancel.on('click', () => {
+    modalFade('out')
+})
+
+// Modal 'Link It' button
+btnLinkIt.on('click', () => {
+    modalBtnDisable('disable')
+    const inputEmail = emailField.val()
+    linkImage(inputEmail)
+})
+
+// Pressing enter from the email field fires Link It event
+emailField.keyup(event => {
+    if (event.keyCode === 13) {
+        btnLinkIt.click()
+    }
 })

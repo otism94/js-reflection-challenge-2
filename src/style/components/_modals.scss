@@ -9,27 +9,27 @@
 
     #pointer {
         position: absolute;
+        right: 0;
         bottom: 140px;
         left: 0;
-        right: 0;
-        margin-left: auto;
         margin-right: auto;
+        margin-left: auto;
         z-index: 2001;
         width: 20px;
         height: 20px;
         transform: rotate(-45deg);
         background: linear-gradient(45deg, rgba(107, 107, 107, .9) 50%, transparent 50%);
-        @include mq('sm') {
-            bottom: 80px;
-            right: 160px;
-        }
         @include mq('md') {
-            left: 295px;
+            right: 160px;
+            bottom: 80px;
+        }
+        @include mq('lg') {
             top: 123px;
+            left: 295px;
             right: auto;
             bottom: auto;
-            margin-left: 0;
             margin-right: 0;
+            margin-left: 0;
             transform: rotate(45deg);
         }
     }
@@ -37,26 +37,26 @@
     #link-input {
         position: absolute;
         z-index: 2000;
+        right: 0;
         bottom: 150px;
         left: 0;
-        right: 0;
         background-color: rgba(107, 107, 107, .9);
         width: 300px;
         border-radius: 3px;
         padding: 5px;
-        margin-left: auto;
         margin-right: auto;
+        margin-left: auto;
         box-shadow: 5px 5px 10px rgba(0, 0, 0, .25);
-        @include mq('sm') {
+        @include mq('md') {
             bottom: 90px;
         }
-        @include mq('md') {
+        @include mq('lg') {
             top: 108px;
-            left: 305px;
             right: auto;
             bottom: auto;
-            margin-left: 0;
+            left: 305px;
             margin-right: 0;
+            margin-left: 0;
         }
     
         label {
@@ -103,17 +103,6 @@
                 display: flex;
                 flex-wrap: nowrap;
                 justify-content: space-between;
-    
-                .btn-linkit,
-                .btn-cancel {
-                    position: relative;
-                    width: 143px;
-                    height: 42px;
-                    opacity: 1;
-                    .fas {
-                        margin-right: 5px;
-                    }
-                }
             }
         }
 

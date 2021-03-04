@@ -1,14 +1,14 @@
 #sidebar {
     order: 2;
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    position: relative;
     min-width: 300px;
     height: auto;
     background-color: $bg-light;
     padding: 5px;
-    @include mq('md') {
+    @include mq('lg') {
         order: 1;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
@@ -20,36 +20,34 @@
         flex-direction: column;
         padding: 0 10px;
         margin: auto;
-        @include mq('xs') {
+        @include mq('sm') {
             width: 290px;
         }
-        @include mq('sm') {
+        @include mq('md') {
             width: 340px;
         }
-        @include mq('md') {
+        @include mq('lg') {
             width: 100%;
             margin: 0;
         }
 
         #sidebar-buttons {
-            display: block;
             order: 2;
-            @include mq('sm') {
+            display: block;
+            @include mq('md') {
                 display: flex;
                 justify-content: space-between;
             }
-            @include mq('md') {
-                display: block;
+            @include mq('lg') {
                 order: 1;
+                display: block;
             }
         }
 
         #photo-info {
             order: 1;
-            @include mq('md') {
-                order: 2;
-            }
             @include mq('lg') {
+                order: 2;
                 width: 100%;
             }
 
@@ -57,7 +55,7 @@
                 display: flex;
                 align-items: center;
                 margin-top: 10px;
-                @include mq('md') {
+                @include mq('lg') {
                     display: block;
                     margin-top: 0;
                 }
@@ -69,23 +67,23 @@
                     h2 {
                         display: inline-block;
                         margin: 5px 10px 5px 0;
-                        @include mq('md') {
+                        @include mq('lg') {
                             margin: 20px 10px 20px 0;
                         }
                     }
                     span {
-                        font-size: 18px;
-                        color: $text-lighter;
-                        background-color: $white;
                         border: 2px solid rgba(0, 0, 0, .2);
                         border-radius: 3px;
                         padding: 0 5px;
+                        background-color: $white;
+                        color: $text-lighter;
+                        font-size: 18px;
                     }
                 }
 
                 #links-count {
                     margin-left: 20px;
-                    @include mq('md') {
+                    @include mq('lg') {
                         margin: 0;
                     }
                 }
@@ -103,8 +101,8 @@
                 }
 
                 a {
-                    @include theme-color($blue, font);
                     text-decoration: none;
+                    @include theme-color($blue, font);
                 }
             }
         }

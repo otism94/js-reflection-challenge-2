@@ -3,15 +3,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0 4px;
-    margin-top: auto;
-    margin-bottom: auto;
     max-width: 100%;
     height: calc(100vh - 367px);
-    @include mq('sm') {
+    padding: 0 4px;
+    margin: auto 0;
+    @include mq('md') {
         height: calc(100vh - 302px);
     }
-    @include mq('md') {
+    @include mq('lg') {
         order: 2;
         height: calc(100vh - 100px);
     }
@@ -19,22 +18,22 @@
     #img-container {
         display: flex;
         justify-content: center;
-        padding: 8px;
         max-width: 100%;
         max-height: 100%;
+        padding: 8px;
 
         #loaded-img {
             display: none;
-            object-fit: contain;
             max-width: 100%;
             max-height: 100%;
+            object-fit: contain;
         }
 
         #error {
             width: 100vw;
             text-align: center;
-            @include mq('md') {
-                width: calc(100vw - 300px)
+            @include mq('lg') {
+                width: calc(100vw - 300px);
             }
 
             span {
@@ -43,28 +42,28 @@
         }
     }
 
+    /* Internet Explorer image scaling */
     @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
         margin: auto;
 
         #img-container {
             max-height: calc(100vh - 367px);
-            @include mq('sm') {
+            @include mq('md') {
                 max-height: calc(100vh - 302px);
             }
-            @include mq('md') {
+            @include mq('lg') {
                 order: 2;
                 max-height: calc(100vh - 100px);
             }
+
             #loaded-img {
+                max-height: calc(100vh - 367px - 16px);
                 width: 100%;
                 height: 100%;
-                max-width: 100%;
-                max-height: calc(100vh - 367px - 16px);
-                @include mq('sm') {
+                @include mq('md') {
                     max-height: calc(100vh - 302px - 16px);
                 }
-                @include mq('md') {
-                    order: 2;
+                @include mq('lg') {
                     max-height: calc(100vh - 100px - 16px);
                 }
             }

@@ -1,13 +1,8 @@
-// Font stacks
-$heading: 'Akaya Telivigala', 'Helvetica', 'Arial', cursive;
-$body: 'ABeeZee', 'Helvetica', 'Arial', sans-serif;
-
 // Media query breakpoints map
 $breakpoints: (
-    'xs': 767px,
-    'sm': 768px,
-    'md': 1024px,
-    'lg': 1440px,
+    'sm': 767px,
+    'md': 768px,
+    'lg': 1024px
 );
 
 // Colours
@@ -20,16 +15,20 @@ $text-lighter: #8b8b8b;
 $text-lightest: #dadada;
 
 $red: (
-    "default": #ec3746,
-    "hover": #c7202e
+    'default': #ec3746,
+    'hover': #c7202e
 );
 
 $green: (
-    "default": #29db29,
-    "hover": #27c227
+    'default': #29db29,
+    'hover': #27c227
 );
 
 $blue: (
-    "default": #307ce0,
-    "hover": #2366bd
+    'default': #307ce0,
+    'hover': #2366bd
 );
+
+// Font stacks
+$heading: 'Akaya Telivigala', 'Helvetica', 'Arial', cursive;
+$body: 'ABeeZee', 'Helvetica', 'Arial', sans-serif;
