@@ -1,0 +1,118 @@
+$custom-width: 250px;
+
+.pushy {
+    width: $custom-width;
+}
+
+.pushy-right{
+    -webkit-transform: translate3d( $custom-width ,0,0);
+    -ms-transform: translate3d( $custom-width ,0,0);
+    transform: translate3d( $custom-width ,0,0);
+}
+
+.pushy-open-right{
+    #container, .push {
+        -webkit-transform: translate3d( unquote('-' + $custom-width) ,0,0);
+        -ms-transform: translate3d( unquote('-' + $custom-width) ,0,0);
+        transform: translate3d( unquote('-' + $custom-width) ,0,0);
+    }
+}
+
+.site-overlay:hover {
+    cursor: pointer;
+}
+
+.pushy {
+    background-color: $bg-dark;
+
+    h2 {
+        text-align: center;
+        margin: 25px 0 0;
+        font-size: 50px;
+        color: $text-lightest;
+    }
+
+    #sidemenu-links, #sidemenu-emails {
+        padding: 10px;
+        color: $text-lighter;
+
+        h3 {
+            display: inline-block;
+            color: $text-lightest;
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 5px;
+
+            &:hover {
+                cursor: pointer;
+                color: $white;
+            }
+        }
+
+        ul {
+            padding: 0;
+
+            li {
+                overflow: hidden;
+                padding-bottom: 5px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                @include theme-color($blue, font);
+
+                &#sidemenu-no-links, &#sidemenu-no-emails {
+                    color: $text-primary;
+                }
+
+                .email-links-count {
+                    display: inline-block;
+                    padding: 0 3px;
+                    background-color: rgba(0, 0, 0, .4);
+                    color: $text-lightest;
+                    border-radius: 3px;
+                    min-width: 19px;
+                }
+            
+                .email-link {
+                    z-index: 50;
+                    @include theme-color($blue, font);
+            
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+
+    .submenu--closed::before {
+        display: inline-block;
+        content: url("../img/arrow.svg");
+        margin-right: 10px;
+        transform: rotate(0deg);
+        transition: transform .2s;
+    }
+
+    .submenu--open::before {
+        display: inline-block;
+        content: url("../img/arrow.svg");
+        margin-right: 10px;
+        transform: rotate(90deg);
+        transition: transform .2s;
+    }
+
+    #sidemenu-links {
+        display: block;
+        @include mq('lg') {
+            display: none;
+        }
+    }
+
+    footer {
+        display: block;
+        margin-top: auto;
+
+        @include mq('lg') {
+            display: none;
+        }
+    }
+}

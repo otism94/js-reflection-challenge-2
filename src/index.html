@@ -17,6 +17,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 
         <!-- Style -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pushy/1.4.0/css/pushy.min.css" integrity="sha512-t9XgtW+6fclSmC40J6dyCPBBsc/9Jd5hQrqc8LEhg8zuQyOpi7UMckM8U6lXuw265vTPYhG8+527qWNIMrKiZA==" crossorigin="anonymous"/>
         <link href="style/style.css" rel="stylesheet"/>
 
         <!-- Fonts -->
@@ -25,15 +26,50 @@
     </head>
 
     <body>
-        <header>
-            <div id="header-title">
-                <i class="fas fa-images" id="icon-logo"></i> 
-                <h1>imgAt</h1>
+        <header class="push">
+            <div id="header-main">
+                <div id="header-title">
+                    <i class="fas fa-images" id="icon-logo"></i> 
+                    <h1>imgAt</h1>
+                </div>
+                <span id="tagline">Link images to an email.</span>
             </div>
-            <span id="tagline">Link images to an email.</span>
+            <div id="sidemenu-button">
+                <button type="button" class="btn hamburger hamburger--elastic">
+                    <span class="hamburger-box">
+                      <span class="hamburger-inner"></span>
+                    </span>
+                </button>
+            </div>
         </header>
 
-        <main>
+        <nav class="pushy pushy-right" data-menu-btn-selector=".hamburger">
+            <div class="pushy-content">
+                <h2><i class="fas fa-envelope"></i></h2>
+                <div id="sidemenu-links">
+                    <h3 id="sidemenu-links-h3">Linked to</h3>
+                    <ul id="sidemenu-links-list">
+                        <li id="sidemenu-no-links">No one... yet.</li>
+                    </ul>
+                </div>
+                <div id="sidemenu-emails">
+                    <h3 id="sidemenu-emails-h3">All linked emails</h3>
+                    <ul id="sidemenu-emails-list">
+                        <li id="sidemenu-no-emails">None... yet.</li>
+                    </ul>
+                </div>
+                <footer>
+                    <ul>
+                        <li>&copy; 2021 Otis Moorman</li>
+                        <li><span>Powered by <a href="https://picsum.photos/" target="_blank">Lorem Picsum</a></span></li>
+                    </ul>
+                </footer>
+            </div>
+        </nav>
+
+        <div class="site-overlay"></div>
+
+        <main id="container">
             <div id="photo-area">
                 <div id="img-container"></div>
             </div>
@@ -49,6 +85,13 @@
                         </button>
                     </div>
                     <div id="photo-info"></div>
+                    <div id="links-info">
+                        <h2>Linked to</h2>
+                        <span id="no-links">No one... yet.</span>
+                        <ul id="links-list">
+
+                        </ul>
+                    </div>
                 </div>
 
                 <footer>
@@ -85,6 +128,8 @@
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <!-- Axios polyfill -->
         <script src="https://unpkg.com/core-js-bundle@3.9.1/minified.js"></script>
+        <!-- Pushy -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pushy/1.4.0/js/pushy.min.js"></script>
         <!-- Fontawesome -->
         <script src="https://kit.fontawesome.com/e97517236b.js" crossorigin="anonymous"></script>
         <!-- Main JS -->

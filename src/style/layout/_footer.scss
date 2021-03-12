@@ -11,9 +11,11 @@ footer {
         text-align: center;
 
         a, a:visited {
-            color: $text-primary;
-            text-decoration: underline;
-            text-decoration-style: dotted;
+            padding: 0 !important;
+            display: inline !important;
+            color: $text-primary !important;
+            text-decoration: underline !important;
+            text-decoration-style: dotted !important;
         }
     }
 }

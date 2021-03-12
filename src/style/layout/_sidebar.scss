@@ -5,12 +5,19 @@
     flex-direction: column;
     justify-content: space-between;
     min-width: 300px;
-    height: auto;
     background-color: $bg-light;
     padding: 5px;
+    @include mq('sm') {
+        height: 267px;
+    }
+    @include mq('md') {
+        height: 202px;
+    }
     @include mq('lg') {
         order: 1;
         overflow: auto;
+        width: 300px;
+        height: auto;
         -webkit-overflow-scrolling: touch;
         -ms-overflow-style: none;
     }
@@ -56,7 +63,6 @@
                 align-items: center;
                 margin-top: 10px;
                 @include mq('lg') {
-                    display: block;
                     margin-top: 0;
                 }
 
@@ -68,7 +74,7 @@
                         display: inline-block;
                         margin: 5px 10px 5px 0;
                         @include mq('lg') {
-                            margin: 20px 10px 20px 0;
+                            margin: 15px 10px 15px 0;
                         }
                     }
                     span {
@@ -83,26 +89,88 @@
 
                 #links-count {
                     margin-left: 20px;
-                    @include mq('lg') {
-                        margin: 0;
-                    }
                 }
             }
 
-            li {
-                line-height: 1.5em;
-
-                .fa-user-circle {
-                    margin-right: 5px;
+            #info-list {
+                margin: 16px 0;
+                @include mq('lg') {
+                    margin-top: 0;
                 }
 
-                .fa-unsplash {
-                    margin-right: 6.5px;
+                li {
+                    line-height: 1.5em;
+    
+                    .fa-user-circle {
+                        margin-right: 5px;
+                    }
+    
+                    .fa-unsplash {
+                        margin-right: 6.5px;
+                    }
+    
+                    a {
+                        text-decoration: none;
+                        @include theme-color($blue, font);
+                    }
                 }
+            }
+        }
 
-                a {
-                    text-decoration: none;
+        #selected-email {
+            display: block;
+            overflow: hidden;
+            margin-bottom: 62px;
+            color: map-get($map: $blue, $key: 'default');
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #links-info {
+            display: none;
+            order: 3;
+            @include mq('lg') {
+                display: block;
+            }
+
+            h2 {
+                margin: 5px 10px 5px 0;
+                @include mq('lg') {
+                    margin: 15px 10px 15px 0;
+                }
+            }
+
+            #no-links {
+                color: $text-lighter;
+            }
+
+            #links-list {
+                margin: 0;
+
+                li {
+                    overflow: hidden;
+                    margin: 5px 0;
                     @include theme-color($blue, font);
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+
+                    .email-link {
+                        @include theme-color($blue, font);
+                        &:hover {
+                            cursor: pointer;
+                        }
+                    }
+
+                    .email-links-count {
+                        display: inline-block;
+                        padding: 0 3px;
+                        border: 2px solid rgba(0, 0, 0, .2);
+                        background-color: $white;
+                        color: $text-lighter;
+                        border-radius: 3px;
+                        min-width: 19px;
+                    }
+                    
                 }
             }
         }

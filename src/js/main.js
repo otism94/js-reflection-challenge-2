@@ -20,9 +20,13 @@ const btnPastEmail = $('.btn-past-email')
 const btnCancel = $('.btn-cancel')
 const btnLinkIt = $('.btn-linkit')
 
+// State tracker
+let fromLinksView = false
+let getOldImg = false
+
 // Image storage
+const linkedImages = {}
 let displayedImg = null
-let linkedImages = {}
 
 // Email storage
 const savedEmails = {}
@@ -121,13 +125,60 @@ const loadImageDetails = () => {
             <li><i class="fab fa-unsplash"></i><a href="${displayedImg.url}" target="_blank">View this image on Unsplash</a></li>
         </li>
     `)
+    if (displayedImg.links.length) {
+        displayedImg.links.forEach(email => {
+            $('#no-links').hide()
+            $('#sidemenu-no-links').hide()
+            $('#sidemenu-no-emails').hide()
+            $('#links-list').append(`<li><span class="email-links-count">${savedEmails[email].length}</span> <span class="email-link">${email}</span></li>`)
+            $('#sidemenu-links-list').append(`<li><span class="email-links-count">${savedEmails[email].length}</span> <span class="email-link">${email}</span></li>`)
+        })
+    } else {
+        $('#no-links').show()
+        $('#sidemenu-no-links').show()
+    }
 }
 
 // Removes image and loads a new one
 const newImage = () => {
-    loadedImg.fadeOut(500, () => {
-        loadedImg.remove()
-        getImages()
+    if (fromLinksView) {
+        $('#column-1').fadeOut(500)
+        $('#column-2').fadeOut(500, () => {
+            $('#column-1, #column-2').remove()
+            if (!getOldImg) {
+                getImages()
+            } else if (getOldImg) {
+                loadImage()
+                loadImageDetails()
+            }
+            $('#links-info, #sidemenu-links').show()
+            getOldImg = fromLinksView = false
+        })
+    } else {
+        loadedImg.fadeOut(500, () => {
+            loadedImg.remove()
+            getImages()
+        })
+    }
+    $('#links-list').children().toArray().forEach(child => {
+        $(child).remove()
+    })
+    $('#sidemenu-links-list').children().toArray().forEach(child => {
+        if ($(child).attr('id') !== 'sidemenu-no-links') {
+            $(child).remove()
+        }
+    })
+    btnRefresh.html(`${btnRefreshHTML}Loading...`)
+        .addClass('loading')
+        .attr('disabled', 'disabled')
+    btnLink.addClass('loading')
+        .attr('disabled', 'disabled')
+    $({rotation: 0}).animate({rotation: 360}, {
+        duration: 1500,
+        easing: 'linear',
+        step: function() {
+            $('#icon-refresh').css({transform: `rotate(${this.rotation}deg)`})
+        }
     })
 }
 
@@ -157,6 +208,7 @@ const linkEmail = email => {
     }
     if (isNewEmail) {
         savedEmails[`${email}`] = [displayedImg]
+        updateEmails()
     } else {
         for (let i = 0; i < savedEmails[`${email}`].length; i++) {
             if (savedEmails[`${email}`][i].id === displayedImg.id) {
@@ -166,6 +218,7 @@ const linkEmail = email => {
         }
         if (!alreadyLinked) {
             savedEmails[`${email}`].push(displayedImg)
+            updateEmails()
         } else {
             emailField.focus()
             linkStatus.addClass('fail')
@@ -196,6 +249,16 @@ const linkImage = inputEmail => {
             $('#links-count').html(`
                 <i class="fas fa-link" id="icon-link"></i> ${linkedImages[displayedImg.id].links.length}
             `)
+            $('#no-links, #sidemenu-no-links').hide()
+            $('#links-list, #sidemenu-links-list').append(`
+                <li>
+                    <span class="email-links-count">${savedEmails[inputEmail].length}</span>
+                    <span class="email-link">${inputEmail}</span>
+                </li>
+            `)
+            if (!$('.hamburger').hasClass('notification')) {
+                $('.hamburger').toggleClass('notification')
+            }
             lastUsedEmail = inputEmail
             linkStatus.removeClass('fail')
                 .addClass('success')
@@ -215,6 +278,67 @@ const validateEmail = email => {
         return true
     } else {
         return false
+    }
+}
+
+// Update 'All linked emails' list
+const updateEmails = () => {
+    $('#sidemenu-emails-list').children().toArray().forEach(child => $(child).remove())
+    for (let email in savedEmails) {
+        $('#sidemenu-emails-list').append(`<li><span class="email-links-count">${savedEmails[email].length}</span> <span class="email-link">${email}</span></li>`)
+    }
+}
+
+/**
+ * Load Saved Images Functions
+ */
+
+const waitForLoad = img => {
+    img.onload = () => {
+        $(`#column-${column}`).append('<div class="linked-img">')
+            .append(img)
+            .append('</div>')
+        loadedImg.fadeIn(500)
+        return true
+    }
+}
+
+const getSavedImages = email => {
+    $(loadedImg, '#column-1, #column-2').fadeOut(500)
+    setTimeout(() => {
+        loadedImg.remove()
+        $('#column-1, #column-2').remove()
+        for (let i = 1; i <= 2; i++) {
+            imgContainer.append(`<div id="column-${i}"></div>`)
+        }
+        loadSavedImages(savedEmails[email], displayLoadedImages)
+    }, 500)
+}
+
+const loadSavedImages = (array, onAllLoaded) => {
+    let i = 0
+    let numLoading = array.length
+    const onload = () => --numLoading === 0 && onAllLoaded(images)
+    let images = {}
+    while (i < array.length) {
+        const img = images[i] = new Image
+        img.src = array[i].download_url
+        img.className = 'loaded-linked-img'
+        img.id = array[i].id
+        img.onload = onload
+        i++
+    }
+}
+
+const displayLoadedImages = imageCollection => {
+    let column = 1
+    for (let image in imageCollection) {
+        $(`#column-${column}`).append(`<div class="linked-img" id="img-${imageCollection[image].id}">`)
+        $(`#img-${imageCollection[image].id}`).append(imageCollection[image])
+        column++
+        if (column > 2) {
+            column = 1
+        }
     }
 }
 
@@ -259,13 +383,9 @@ const modalFade = dest => {
 // Modal button disable/re-enable
 const modalBtnDisable = attr => {
     if (attr === 'disable') {
-        btnPastEmail.attr('disabled', 'disabled')
-        btnCancel.attr('disabled', 'disabled')
-        btnLinkIt.attr('disabled', 'disabled')
+        $(btnPastEmail, btnCancel, btnCancel).attr('disabled', 'disabled')
     } else if (attr === 'enable') {
-        btnPastEmail.removeAttr('disabled')
-        btnCancel.removeAttr('disabled')
-        btnLinkIt.removeAttr('disabled')
+        $(btnPastEmail, btnCancel, btnCancel).removeAttr('disabled')
     }
 }
 
@@ -279,27 +399,47 @@ $(document).ready(() => {
     logoColor()
 })
 
-// 'Link Image' button
-btnLink.on('click', () => {
-    modalFade('in')
+// Hamburger button
+$('.hamburger').on('click', function() {
+    $(this).toggleClass('is-active')
+    if ($(this).hasClass('notification')) {
+        $('.hamburger').toggleClass('notification')
+    }
+    $('#sidemenu-links-h3, #sidemenu-emails-h3').removeClass('submenu--closed submenu--open')
+    if ($(window).width() < 1024) {
+        $('#sidemenu-links-h3').addClass('submenu--open')
+            .next().slideDown(500)
+        $('#sidemenu-emails-h3').addClass('submenu--closed')
+            .next().hide()
+    } else {
+        $('#sidemenu-links-h3').addClass('submenu--closed')
+            .next().hide()
+        $('#sidemenu-emails-h3').addClass('submenu--open')
+            .next().slideDown(500)
+    }
 })
 
-// 'New Image' button
-btnRefresh.on('click', () => {
-    newImage()
-    btnRefresh.html(`${btnRefreshHTML}Loading...`)
-        .addClass('loading')
-        .attr('disabled', 'disabled')
-    btnLink.addClass('loading')
-        .attr('disabled', 'disabled')
-    $({rotation: 0}).animate({rotation: 360}, {
-        duration: 1500,
-        easing: 'linear',
-        step: function() {
-            $('#icon-refresh').css({transform: `rotate(${this.rotation}deg)`})
-        }
-    })
+// Site overlay
+$('.site-overlay').on('click', () => $('.hamburger').toggleClass('is-active'))
+
+// Side menu submenus
+$('#sidemenu-links-h3, #sidemenu-emails-h3').on('click', function(event) {
+    if ($(this).hasClass('submenu--closed')) {
+        $(this).removeClass('submenu--closed')
+            .addClass('submenu--open')
+            .next().slideDown(200)
+    } else {
+        $(this).removeClass('submenu--open')
+            .addClass('submenu--closed')
+            .next().slideUp(200)
+    }
 })
+
+// 'Link Image' button
+btnLink.on('click', () => modalFade('in'))
+
+// 'New Image' button
+btnRefresh.on('click', () => newImage())
 
 // Closes modal box when clicking outside it
 linkBox.on('click', event => {
@@ -315,9 +455,7 @@ btnPastEmail.on('click', () => {
 })
 
 // Modal 'Cancel' button
-btnCancel.on('click', () => {
-    modalFade('out')
-})
+btnCancel.on('click', () => modalFade('out'))
 
 // Modal 'Link It' button
 btnLinkIt.on('click', () => {
@@ -331,4 +469,37 @@ emailField.keyup(event => {
     if (event.keyCode === 13) {
         btnLinkIt.click()
     }
+})
+
+// Read text content when clicking dynamic list item
+$(document).on('click', '.email-link', event => {
+    fromLinksView = true
+    $(btnLink).addClass('loading')
+        .attr('disabled', 'disabled')
+    const selectedEmail = event.target.textContent
+    getSavedImages(`${selectedEmail}`)
+    let headingMessage = ''
+    if (savedEmails[selectedEmail].length === 1) {
+        headingMessage = '1 image linked to'
+    } else {
+        headingMessage = `${savedEmails[selectedEmail].length} images linked to`
+    }
+    $('#photo-info').html(`
+        <div id="photo-heading">
+            <div id="photo-id">
+                <h2>${headingMessage}</h2><br/>
+            </div>
+        </div>
+        <span id="selected-email">${selectedEmail}</span>
+    `)
+    $('#links-info').hide()
+    $('#sidemenu-links').hide()
+})
+
+// Read ID when clicking dynamic linked image
+$(document).on('click', '.loaded-linked-img', event => {
+    getOldImg = true
+    const clickedImgID = $(event.target).attr('id')
+    displayedImg = linkedImages[clickedImgID]
+    newImage()
 })

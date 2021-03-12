@@ -11,11 +11,13 @@
         'base/base';
 
 // Component Styles
-@import 'components/modals',
+@import 'hamburgers/hamburgers.scss',
+        'components/modals',
         'components/buttons'; 
 
 // Layout Styles
 @import 'layout/header',
+        'layout/sidemenu',
         'layout/sidebar',
         'layout/photoarea',
         'layout/footer';
