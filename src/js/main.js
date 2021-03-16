@@ -1,17 +1,16 @@
 /**
- * Variables
+ * Global Variables
  */
-
-// Picsum API
-const picsumURL = page => `https://picsum.photos/v2/list?page=${page}&limit=100`
 
 // Main page DOM queries
 const linkBox = $('#modal-link-box')
 const imgContainer = $('#img-container')
-let loadedImg = $('#loaded-img')
+let loadedImg = $('#loaded-img') // This element gets added/removed and so needs to be updated
+const imgInfo = $('#photo-info')
 const btnLink = $('.btn-link')
 const btnRefresh = $('.btn-refresh')
 const btnRefreshHTML = '<i class="fas fa-redo-alt" id="icon-refresh"></i>'
+const btnHamburger = $('.hamburger')
 
 // Modal box DOM queries
 const emailField = $('#user-email-field')
@@ -20,12 +19,19 @@ const btnPastEmail = $('.btn-past-email')
 const btnCancel = $('.btn-cancel')
 const btnLinkIt = $('.btn-linkit')
 
-// State tracker
-let fromLinksView = false
-let getOldImg = false
+// Linked emails DOM queries
+const linksInfo = $('#links-info')
+const linksInfoSide = $('#sidemenu-links')
+const allLinkedEmailsList = $('#sidemenu-emails-list')
+const thisImgLinksHead = $('#sidemenu-links-h3')
+const allImgsLinksHead = $('#sidemenu-emails-h3')
+const linksList = $('#links-list')
+const linksListSide = $('#sidemenu-links-list')
+const noLinksInfo = $('#no-links')
+const noLinksInfoSide = $('#sidemenu-no-links')
 
 // Image storage
-const linkedImages = {}
+const linkedImgs = {}
 let displayedImg = null
 
 // Email storage
@@ -39,7 +45,7 @@ const mailFormat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}
  * Classes
  */
 
-// Image Details for displayedImg and linkedImages
+// Image Details for displayedImg and linkedImgs
 const ImageDetails = class {
     constructor(id, author, url, download_url, links) {
         this.id = id,
@@ -57,8 +63,7 @@ const ImageDetails = class {
 // Fetches an image
 const getImages = () => {
     const randomPage = Math.floor(Math.random() * (10) + 1)
-    const getPicsum = picsumURL(randomPage)
-    axios.get(getPicsum)
+    axios.get(`https://picsum.photos/v2/list?page=${randomPage}&limit=100`)
         .then(response => {
             pickRandomImage(response.data)
             $('#error').remove()
@@ -72,19 +77,14 @@ const pickRandomImage = array => {
     const chosenImage = array[randomImage]
     const chosenImageLinks = checkLinks(chosenImage)
     displayedImg = new ImageDetails(chosenImage.id, chosenImage.author, chosenImage.url, chosenImage.download_url, chosenImageLinks)
-    loadImage()
-    loadImageDetails()
+    loadImage(), loadImageDetails()
 }
 
 // Checks how many times the displayed image has been linked
 const checkLinks = img => {
-    if (!jQuery.isEmptyObject(linkedImages)) {
-        for (const id in linkedImages) {
-            if (linkedImages[id].links.length > 0 && id === img.id) {
-                return linkedImages[id].links
-            } else {
-                return []
-            }
+    if (!jQuery.isEmptyObject(linkedImgs)) {
+        for (const id in linkedImgs) {
+            return (linkedImgs[id].links.length > 0 && id === img.id) ? linkedImgs[id].links : []
         }
     } else {
         return []
@@ -96,9 +96,8 @@ const loadImage = () => {
     const img = new Image()
     img.onload = () => {
         btnRefresh.html(`${btnRefreshHTML}New Image`)
+        btnRefresh.add(btnLink)
             .removeClass('loading')
-            .removeAttr('disabled')
-        btnLink.removeClass('loading')
             .removeAttr('disabled')
         imgContainer.append(img)
         loadedImg = $('#loaded-img')
@@ -110,7 +109,7 @@ const loadImage = () => {
 
 // Retrieves image details from object and displays in sidebar
 const loadImageDetails = () => {
-    $('#photo-info').html(`
+    imgInfo.html(`
         <div id="photo-heading">
             <div id="photo-id">
                 <h2>Image</h2>
@@ -127,47 +126,35 @@ const loadImageDetails = () => {
     `)
     if (displayedImg.links.length) {
         displayedImg.links.forEach(email => {
-            $('#no-links').hide()
-            $('#sidemenu-no-links').hide()
-            $('#sidemenu-no-emails').hide()
-            $('#links-list').append(`<li><span class="email-links-count">${savedEmails[email].length}</span> <span class="email-link">${email}</span></li>`)
-            $('#sidemenu-links-list').append(`<li><span class="email-links-count">${savedEmails[email].length}</span> <span class="email-link">${email}</span></li>`)
+            noLinksInfo.add(noLinksInfoSide).add('#sidemenu-no-emails').hide()
+            linksList.add(linksListSide).append(`
+                <li>
+                    <span class="email-links-count">${savedEmails[email].length}</span> <span class="email-link">${email}</span>
+                </li>
+            `)
         })
     } else {
-        $('#no-links').show()
-        $('#sidemenu-no-links').show()
+        noLinksInfo.add(noLinksInfoSide).show()
     }
 }
 
 // Removes image and loads a new one
-const newImage = () => {
+const newImage = (fromLinksView, wantOldImg) => {
     if (fromLinksView) {
-        $('#column-1').fadeOut(500)
-        $('#column-2').fadeOut(500, () => {
+        $('#column-1, #column-2').fadeOut(500)
+        setTimeout(() => {
             $('#column-1, #column-2').remove()
-            if (!getOldImg) {
-                getImages()
-            } else if (getOldImg) {
-                loadImage()
-                loadImageDetails()
-            }
-            $('#links-info, #sidemenu-links').show()
-            getOldImg = fromLinksView = false
-        })
+            wantOldImg ? (loadImage(), loadImageDetails()) : getImages()
+            $(window).innerWidth < 1024 ? linksInfoSide.show() : linksInfo.show()
+            linksInfo.add(linksInfoSide).removeAttr('style')
+        }, 500)
     } else {
         loadedImg.fadeOut(500, () => {
             loadedImg.remove()
             getImages()
         })
     }
-    $('#links-list').children().toArray().forEach(child => {
-        $(child).remove()
-    })
-    $('#sidemenu-links-list').children().toArray().forEach(child => {
-        if ($(child).attr('id') !== 'sidemenu-no-links') {
-            $(child).remove()
-        }
-    })
+    linksList.add(linksListSide).children().toArray().forEach(child => $(child).attr('id') !== 'sidemenu-no-links' && $(child).remove())
     btnRefresh.html(`${btnRefreshHTML}Loading...`)
         .addClass('loading')
         .attr('disabled', 'disabled')
@@ -222,9 +209,7 @@ const linkEmail = email => {
         } else {
             emailField.focus()
             linkStatus.addClass('fail')
-                .html(`
-                    <i class="fas fa-exclamation-circle"></i> Email already linked!
-                `)
+                .html(`<i class="fas fa-exclamation-circle"></i> Email already linked!`)
             modalBtnDisable('enable')
         }
     }
@@ -237,34 +222,25 @@ const linkImage = inputEmail => {
     if (!isValid) {
         emailField.focus()
         linkStatus.addClass('fail')
-            .html(`
-                <i class="fas fa-exclamation-circle"></i> Invalid email! Try again.
-            `)
+            .html(`<i class="fas fa-exclamation-circle"></i> Invalid email! Try again.`)
         modalBtnDisable('enable')
     } else {
         const alreadyLinked = linkEmail(inputEmail)
         if (!alreadyLinked) {
-            linkedImages[displayedImg.id] = displayedImg
-            linkedImages[displayedImg.id].links.push(inputEmail)
-            $('#links-count').html(`
-                <i class="fas fa-link" id="icon-link"></i> ${linkedImages[displayedImg.id].links.length}
-            `)
-            $('#no-links, #sidemenu-no-links').hide()
-            $('#links-list, #sidemenu-links-list').append(`
+            linkedImgs[displayedImg.id] = displayedImg
+            linkedImgs[displayedImg.id].links.push(inputEmail)
+            $('#links-count').html(`<i class="fas fa-link" id="icon-link"></i> ${linkedImgs[displayedImg.id].links.length}`)
+            noLinksInfo.add(noLinksInfoSide).hide()
+            linksList.add(linksListSide).append(`
                 <li>
-                    <span class="email-links-count">${savedEmails[inputEmail].length}</span>
-                    <span class="email-link">${inputEmail}</span>
+                    <span class="email-links-count">${savedEmails[inputEmail].length}</span> <span class="email-link">${inputEmail}</span>
                 </li>
             `)
-            if (!$('.hamburger').hasClass('notification')) {
-                $('.hamburger').toggleClass('notification')
-            }
+            !btnHamburger.hasClass('notification') && btnHamburger.toggleClass('notification')
             lastUsedEmail = inputEmail
             linkStatus.removeClass('fail')
                 .addClass('success')
-                .html(`
-                    <i class="fas fa-exclamation-circle"></i> Linked!
-                `)
+                .html(`<i class="fas fa-exclamation-circle"></i> Linked!`)
             setTimeout(() => {
                 modalFade('out')
             }, 1000)
@@ -274,18 +250,18 @@ const linkImage = inputEmail => {
 
 // Email validator
 const validateEmail = email => {
-    if (email.match(mailFormat) && email.length > 0) {
-        return true
-    } else {
-        return false
-    }
+    return (email.match(mailFormat) && email.length) > 0 ? true : false
 }
 
 // Update 'All linked emails' list
 const updateEmails = () => {
-    $('#sidemenu-emails-list').children().toArray().forEach(child => $(child).remove())
+    allLinkedEmailsList.children().toArray().forEach(child => $(child).remove())
     for (let email in savedEmails) {
-        $('#sidemenu-emails-list').append(`<li><span class="email-links-count">${savedEmails[email].length}</span> <span class="email-link">${email}</span></li>`)
+        allLinkedEmailsList.append(`
+            <li>
+                <span class="email-links-count">${savedEmails[email].length}</span> <span class="email-link">${email}</span>
+            </li>
+        `)
     }
 }
 
@@ -293,21 +269,11 @@ const updateEmails = () => {
  * Load Saved Images Functions
  */
 
-const waitForLoad = img => {
-    img.onload = () => {
-        $(`#column-${column}`).append('<div class="linked-img">')
-            .append(img)
-            .append('</div>')
-        loadedImg.fadeIn(500)
-        return true
-    }
-}
-
+// Hide current image(s) and get an email's linked image(s)
 const getSavedImages = email => {
-    $(loadedImg, '#column-1, #column-2').fadeOut(500)
+    $('#column-1, #column-2').add(loadedImg).fadeOut(500)
     setTimeout(() => {
-        loadedImg.remove()
-        $('#column-1, #column-2').remove()
+        $('#column-1, #column-2').add(loadedImg).remove()
         for (let i = 1; i <= 2; i++) {
             imgContainer.append(`<div id="column-${i}"></div>`)
         }
@@ -315,6 +281,7 @@ const getSavedImages = email => {
     }, 500)
 }
 
+// Create a new element for each saved image and do not continue until all are loaded
 const loadSavedImages = (array, onAllLoaded) => {
     let i = 0
     let numLoading = array.length
@@ -330,15 +297,13 @@ const loadSavedImages = (array, onAllLoaded) => {
     }
 }
 
+// Create columns and append images to each
 const displayLoadedImages = imageCollection => {
     let column = 1
     for (let image in imageCollection) {
-        $(`#column-${column}`).append(`<div class="linked-img" id="img-${imageCollection[image].id}">`)
+        $(`#column-${column}`).append(`<div class="linked-img" id="img-${imageCollection[image].id}"></div>`)
         $(`#img-${imageCollection[image].id}`).append(imageCollection[image])
-        column++
-        if (column > 2) {
-            column = 1
-        }
+        column++ && column > 2 && (column = 1)
     }
 }
 
@@ -354,10 +319,7 @@ const logoColor = () => {
             'color': `hsl(${hue}, 90%, 60%)`,
             'text-shadow': `0 0 5px hsl(${hue}, 90%, 60%)`
         })
-        hue++
-        if (hue === 360) {
-            hue = 0
-        }
+        hue++ && hue === 360 && (hue = 0)
     }, 10)
 }
 
@@ -383,9 +345,9 @@ const modalFade = dest => {
 // Modal button disable/re-enable
 const modalBtnDisable = attr => {
     if (attr === 'disable') {
-        $(btnPastEmail, btnCancel, btnCancel).attr('disabled', 'disabled')
+        btnPastEmail.add(btnCancel).add(btnLinkIt).attr('disabled', 'disabled')
     } else if (attr === 'enable') {
-        $(btnPastEmail, btnCancel, btnCancel).removeAttr('disabled')
+        btnPastEmail.add(btnCancel).add(btnLinkIt).removeAttr('disabled')
     }
 }
 
@@ -395,41 +357,38 @@ const modalBtnDisable = attr => {
 
 // Page load
 $(document).ready(() => {
-    getImages()
-    logoColor()
+    logoColor(), getImages()
 })
 
 // Hamburger button
-$('.hamburger').on('click', function() {
+btnHamburger.on('click', function() {
     $(this).toggleClass('is-active')
-    if ($(this).hasClass('notification')) {
-        $('.hamburger').toggleClass('notification')
-    }
-    $('#sidemenu-links-h3, #sidemenu-emails-h3').removeClass('submenu--closed submenu--open')
+    $(this).hasClass('notification') && $(this).toggleClass('notification')
+    thisImgLinksHead.add(allImgsLinksHead).removeClass('submenu--closed submenu--open')
     if ($(window).width() < 1024) {
-        $('#sidemenu-links-h3').addClass('submenu--open')
+        thisImgLinksHead.addClass('submenu--open')
             .next().slideDown(500)
-        $('#sidemenu-emails-h3').addClass('submenu--closed')
+        allImgsLinksHead.addClass('submenu--closed')
             .next().hide()
     } else {
-        $('#sidemenu-links-h3').addClass('submenu--closed')
+        thisImgLinksHead.addClass('submenu--closed')
             .next().hide()
-        $('#sidemenu-emails-h3').addClass('submenu--open')
+        allImgsLinksHead.addClass('submenu--open')
             .next().slideDown(500)
     }
 })
 
 // Site overlay
-$('.site-overlay').on('click', () => $('.hamburger').toggleClass('is-active'))
+$('.site-overlay').on('click', () => btnHamburger.toggleClass('is-active'))
 
 // Side menu submenus
-$('#sidemenu-links-h3, #sidemenu-emails-h3').on('click', function(event) {
-    if ($(this).hasClass('submenu--closed')) {
-        $(this).removeClass('submenu--closed')
+thisImgLinksHead.add(allImgsLinksHead).on('click', event => {
+    if ($(event.target).hasClass('submenu--closed')) {
+        $(event.target).removeClass('submenu--closed')
             .addClass('submenu--open')
             .next().slideDown(200)
     } else {
-        $(this).removeClass('submenu--open')
+        $(event.target).removeClass('submenu--open')
             .addClass('submenu--closed')
             .next().slideUp(200)
     }
@@ -439,19 +398,20 @@ $('#sidemenu-links-h3, #sidemenu-emails-h3').on('click', function(event) {
 btnLink.on('click', () => modalFade('in'))
 
 // 'New Image' button
-btnRefresh.on('click', () => newImage())
+btnRefresh.on('click', () => {
+    const fromLinksView = $('#column-1').length ? true : false
+    const wantOldImg = false
+    newImage(fromLinksView, wantOldImg)
+})
 
 // Closes modal box when clicking outside it
 linkBox.on('click', event => {
-    if (!Object.values($('#link-input').find('*')).includes(event.target)) {
-        modalFade('out')
-    }
+    !Object.values($('#link-input').find('*')).includes(event.target) && modalFade('out')
 })
 
 // Modal 'Link to Previous Email' button
 btnPastEmail.on('click', () => {
-    modalBtnDisable('disable')
-    linkImage(lastUsedEmail)
+    modalBtnDisable('disable'), linkImage(lastUsedEmail)
 })
 
 // Modal 'Cancel' button
@@ -459,32 +419,23 @@ btnCancel.on('click', () => modalFade('out'))
 
 // Modal 'Link It' button
 btnLinkIt.on('click', () => {
-    modalBtnDisable('disable')
     const inputEmail = emailField.val()
-    linkImage(inputEmail)
+    modalBtnDisable('disable'), linkImage(inputEmail)
 })
 
 // Pressing enter from the email field fires Link It event
 emailField.keyup(event => {
-    if (event.keyCode === 13) {
-        btnLinkIt.click()
-    }
+    event.keyCode === 13 && btnLinkIt.click()
 })
 
-// Read text content when clicking dynamic list item
+// Dynamic linked emails list item click event
 $(document).on('click', '.email-link', event => {
-    fromLinksView = true
-    $(btnLink).addClass('loading')
+    btnLink.addClass('loading')
         .attr('disabled', 'disabled')
     const selectedEmail = event.target.textContent
     getSavedImages(`${selectedEmail}`)
-    let headingMessage = ''
-    if (savedEmails[selectedEmail].length === 1) {
-        headingMessage = '1 image linked to'
-    } else {
-        headingMessage = `${savedEmails[selectedEmail].length} images linked to`
-    }
-    $('#photo-info').html(`
+    const headingMessage = savedEmails[selectedEmail].length === 1 ? '1 image linked to' : `${savedEmails[selectedEmail].length} images linked to`
+    imgInfo.html(`
         <div id="photo-heading">
             <div id="photo-id">
                 <h2>${headingMessage}</h2><br/>
@@ -492,14 +443,14 @@ $(document).on('click', '.email-link', event => {
         </div>
         <span id="selected-email">${selectedEmail}</span>
     `)
-    $('#links-info').hide()
-    $('#sidemenu-links').hide()
+    linksInfo.add(linksInfoSide).hide()
 })
 
-// Read ID when clicking dynamic linked image
+// Dynamic linked image element click event
 $(document).on('click', '.loaded-linked-img', event => {
-    getOldImg = true
+    const fromLinksView = $('#column-1').length ? true : false
+    const wantOldImg = true
     const clickedImgID = $(event.target).attr('id')
-    displayedImg = linkedImages[clickedImgID]
-    newImage()
+    displayedImg = linkedImgs[clickedImgID]
+    newImage(fromLinksView, wantOldImg)
 })

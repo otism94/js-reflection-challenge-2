@@ -1158,7 +1158,8 @@ header {
           background-color: rgba(0, 0, 0, 0.4);
           color: #dadada;
           border-radius: 3px;
-          min-width: 19px; }
+          min-width: 19px;
+          text-align: center; }
         .pushy #sidemenu-links ul li .email-link, .pushy #sidemenu-emails ul li .email-link {
           z-index: 50;
           color: #307ce0; }
